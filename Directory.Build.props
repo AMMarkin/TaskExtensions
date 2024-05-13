@@ -1,7 +1,0 @@
-<Project>
-	<PropertyGroup>
-		<RestoreAdditionalProjectSources>
-			<!--$(MSBuildThisFileDirectory)/../TaskExtension/TaskExtension.Generators/bin/Debug/-->
-		</RestoreAdditionalProjectSources>
-	</PropertyGroup>
-</Project>
