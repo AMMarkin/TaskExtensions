@@ -14,7 +14,8 @@ internal class TestClass
 
         await task.Catch<Exception>(x => { });
 
-        var result = await GetStringAsync().Catch<NullReferenceException>(x => null);
+        var result = await GetStringAsync().Catch<NullReferenceException>(x => null!)
+            .Catch(e => throw e);
 
         var intresult = await Task.FromResult(1).Catch<NullReferenceException>(x => 1);
     }

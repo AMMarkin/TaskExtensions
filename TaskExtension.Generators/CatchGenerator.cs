@@ -21,10 +21,11 @@ public class CatchGenerator : IIncrementalGenerator
             .Where(x => x?.ReturnsVoid is false)
             .Select((x, _) => x.ReturnType as INamedTypeSymbol)
             .Where(x => x is not null)
+            .Where(x => x.IsGenericType)
             .Combine(taskType)
             .Where(x => x.Left.BaseType?.Equals(x.Right, SymbolEqualityComparer.Default) is true)
             .Where(x => !x.Left.TypeArguments.First().Equals(x.Right, SymbolEqualityComparer.Default))
-            .Where(x => x.Left.TypeArguments.First().BaseType?.Equals(x.Right, SymbolEqualityComparer.Default) is not true)
+            .Where(x => x.Left.TypeArguments.First().BaseType?.Equals(x.Right, SymbolEqualityComparer.Default) is false)
             .Select((x, _) => x.Left)
             .Select((x, _) => x.TypeArguments.First())
             .Collect()
@@ -47,16 +48,16 @@ using System.Threading.Tasks;
 
         text.AppendFormat("namespace {0}.Generated.TaskExtensions;\n\n", assemblyName);
         text.Append("""
-public static class TaskExtensions
+internal static class TaskExtensions
 {
-    public static Task Catch(this Task task, Action<Exception> exceptionHandler)
+    internal static Task Catch(this Task task, Action<Exception> exceptionHandler)
         => task.ContinueWith(completedTask =>
         {
             if (completedTask.IsFaulted)
                 exceptionHandler(completedTask.Exception.InnerException!);
         });
 
-    public static Task<TResult> Catch<TResult>(this Task<TResult> task, Func<Exception, TResult> exceptionHandler)
+    internal static Task<TResult> Catch<TResult>(this Task<TResult> task, Func<Exception, TResult> exceptionHandler)
         => task.ContinueWith(completedTask =>
         {
             if (completedTask.IsFaulted)
@@ -65,7 +66,7 @@ public static class TaskExtensions
                 return completedTask;
         }).Unwrap();
 
-    public static Task Catch<TException>(this Task task, Action<TException> exceptionHandler)
+    internal static Task Catch<TException>(this Task task, Action<TException> exceptionHandler)
         where TException : Exception
         => task.ContinueWith(completedTask =>
         {
@@ -85,7 +86,7 @@ public static class TaskExtensions
         foreach (var type in types)
         {
             text.AppendFormat(@"
-    public static Task<{0}> Catch<TException>(this Task<{0}> task, Func<TException,{0}> exceptionHandler)
+    internal static Task<{0}> Catch<TException>(this Task<{0}> task, Func<TException,{0}> exceptionHandler)
         where TException : Exception
         => task.ContinueWith(completedTask =>
         {{
@@ -103,6 +104,6 @@ public static class TaskExtensions
 
         text.AppendLine("}");
 
-        context.AddSource("Test.gen.cs", text.ToString());
+        context.AddSource("TaskExtensions.gen.cs", text.ToString());
     }
 }
