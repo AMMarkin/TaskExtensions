@@ -12,6 +12,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<None Include="$(MSBuildThisFiledirectory)bin\Debug\$(TargetFramework)\TaskExtension.Generators.dll" Pack="true" PackagePath="analyzers\"/>
+		<None Include="$(MSBuildThisFiledirectory)$(OutputPath)\TaskExtension.Generators.dll" 
+			  Pack="true" PackagePath="analyzers\" Visible="false"/>
 	</ItemGroup>
 </Project>
