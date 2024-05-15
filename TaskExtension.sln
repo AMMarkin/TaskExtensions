@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TaskExtension", "TaskExtens
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TaskExtension.Generators", "TaskExtension.Generators\TaskExtension.Generators.csproj", "{F921FC45-DE7E-43B0-BB19-899C49F81D38}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskExtensions.Tests", "TaskExtensions.Tests\TaskExtensions.Tests.csproj", "{69980C57-6A19-461C-A025-AB0E678E405D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{F921FC45-DE7E-43B0-BB19-899C49F81D38}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F921FC45-DE7E-43B0-BB19-899C49F81D38}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F921FC45-DE7E-43B0-BB19-899C49F81D38}.Release|Any CPU.Build.0 = Release|Any CPU
+		{69980C57-6A19-461C-A025-AB0E678E405D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{69980C57-6A19-461C-A025-AB0E678E405D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{69980C57-6A19-461C-A025-AB0E678E405D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{69980C57-6A19-461C-A025-AB0E678E405D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
