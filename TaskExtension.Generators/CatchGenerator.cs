@@ -51,14 +51,14 @@ using System.Threading.Tasks;
 internal static class TaskExtensions
 {
     internal static Task Catch(this Task task, Action<Exception> exceptionHandler)
-        => task.ContinueWith(completedTask =>
+        => task?.ContinueWith(completedTask =>
         {
             if (completedTask.IsFaulted)
                 exceptionHandler(completedTask.Exception.InnerException!);
         });
 
     internal static Task<TResult> Catch<TResult>(this Task<TResult> task, Func<Exception, TResult> exceptionHandler)
-        => task.ContinueWith(completedTask =>
+        => task?.ContinueWith(completedTask =>
         {
             if (completedTask.IsFaulted)
                 return Task.FromResult(exceptionHandler(completedTask.Exception.InnerException!));
@@ -68,7 +68,7 @@ internal static class TaskExtensions
 
     internal static Task Catch<TException>(this Task task, Action<TException> exceptionHandler)
         where TException : Exception
-        => task.ContinueWith(completedTask =>
+        => task?.ContinueWith(completedTask =>
         {
             if (completedTask is { IsFaulted: true, Exception.InnerException: TException exception })
             {
@@ -88,7 +88,7 @@ internal static class TaskExtensions
             text.AppendFormat(@"
     internal static Task<{0}> Catch<TException>(this Task<{0}> task, Func<TException,{0}> exceptionHandler)
         where TException : Exception
-        => task.ContinueWith(completedTask =>
+        => task?.ContinueWith(completedTask =>
         {{
             if (completedTask is {{ IsFaulted: true, Exception.InnerException: TException exception }})
             {{
