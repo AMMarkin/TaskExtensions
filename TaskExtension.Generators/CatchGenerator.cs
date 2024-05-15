@@ -23,10 +23,10 @@ public class CatchGenerator : IIncrementalGenerator
             .Where(x => x is { IsAnonymousType: false, IsGenericType: true })
             .Combine(taskType)
             .Where(x => x.Left.BaseType?.Equals(x.Right, SymbolEqualityComparer.Default) is true)
-            .Where(x => !x.Left.TypeArguments.First().Equals(x.Right, SymbolEqualityComparer.Default))
-            .Where(x => x.Left.TypeArguments.First().BaseType?.Equals(x.Right, SymbolEqualityComparer.Default) is false)
-            .Select((x, _) => x.Left)
-            .Select((x, _) => x.TypeArguments.First())
+            .Select((x, _) => (Type: x.Left.TypeArguments.First(), TaskType: x.Right))
+            .Where(x => x.Type is { TypeKind: not TypeKind.TypeParameter })
+            .Where(x => x.Type.IsDerivedFrom(x.TaskType) is false)
+            .Select((x, _) => x.Type)
             .Collect()
             .Select((x, _) => x.ToImmutableHashSet(SymbolEqualityComparer.Default));
 
