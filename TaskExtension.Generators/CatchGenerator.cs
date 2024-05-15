@@ -37,16 +37,27 @@ public class CatchGenerator : IIncrementalGenerator
     {
         var (types, assemblyName) = source;
 
-        var text = new StringBuilder();
+        var taskExtensions = GenerateTaskExtensions(types, assemblyName);
 
-        text.AppendFormat("global using {0}.Generated.TaskExtensions;\n", assemblyName);
-        text.AppendLine("""
+        context.AddSource("TaskExtensions.gen.cs", taskExtensions);
+
+        var valueTaskExtensions = GenerateValueTaskExtensions(types, assemblyName);
+
+        context.AddSource("ValueTaskExtensions.gen.cs", valueTaskExtensions);
+    }
+
+    private static string GenerateTaskExtensions(ImmutableHashSet<ISymbol> types, string assemblyName)
+    {
+        var source = new StringBuilder();
+
+        source.AppendFormat("global using {0}.Generated.TaskExtensions;\n", assemblyName);
+        source.AppendLine("""
 using System;
 using System.Threading.Tasks;
 """);
 
-        text.AppendFormat("namespace {0}.Generated.TaskExtensions;\n\n", assemblyName);
-        text.Append("""
+        source.AppendFormat("namespace {0}.Generated.TaskExtensions;\n\n", assemblyName);
+        source.Append("""
 internal static class TaskExtensions
 {
     internal static Task Catch(this Task task, Action<Exception> exceptionHandler)
@@ -100,7 +111,7 @@ internal static class TaskExtensions
 
         foreach (var type in types)
         {
-            text.AppendFormat(@"
+            source.AppendFormat(@"
     internal static Task<{0}> Catch<TException>(this Task<{0}> task, Func<TException,{0}> exceptionHandler)
         where TException : Exception
     {{
@@ -121,9 +132,47 @@ internal static class TaskExtensions
     }}
 ", type);
         }
+        
+        source.AppendLine("}");
+        return source.ToString();
+    }
 
-        text.AppendLine("}");
+    private static string GenerateValueTaskExtensions(ImmutableHashSet<ISymbol> types, string assemblyName)
+    {
+        var source = new StringBuilder();
 
-        context.AddSource("TaskExtensions.gen.cs", text.ToString());
+        source.AppendFormat("global using {0}.Generated.TaskExtensions;\n", assemblyName);
+        source.AppendLine("""
+using System;
+using System.Threading.Tasks;
+""");
+
+        source.AppendFormat("namespace {0}.Generated.TaskExtensions;\n\n", assemblyName);
+        source.Append("""
+internal static class ValueTaskExtensions
+{
+    internal static Task Catch(this ValueTask task, Action<Exception> exceptionHandler)
+        => task.AsTask().Catch(exceptionHandler);
+
+    internal static Task<TResult> Catch<TResult>(this ValueTask<TResult> task, Func<Exception, TResult> exceptionHandler)
+        => task.AsTask().Catch(exceptionHandler);
+
+    internal static Task Catch<TException>(this ValueTask task, Action<TException> exceptionHandler)
+        where TException : Exception
+        => task.AsTask().Catch<TException>(exceptionHandler);
+
+""");
+
+        foreach (var type in types)
+        {
+            source.AppendFormat(@"
+    internal static Task<{0}> Catch<TException>(this ValueTask<{0}> task, Func<TException,{0}> exceptionHandler)
+        where TException : Exception
+        => task.AsTask().Catch<TException>(exceptionHandler);
+", type);
+        }
+
+        source.AppendLine("}");
+        return source.ToString();
     }
 }
